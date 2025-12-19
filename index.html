@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片轮播</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #000; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .slider { width: 90%; max-width: 800px; overflow: hidden; position: relative; }
+        .slider-inner { display: flex; transition: transform 0.5s ease; }
+        .slider-item { width: 100%; flex-shrink: 0; }
+        /* 占位图动画 */
+        .lazy {
+            width: 100%;
+            height: 400px;
+            background: #333;
+            background-image: linear-gradient(
+                45deg, 
+                #444 25%, 
+                transparent 25%, 
+                transparent 50%, 
+                #444 50%, 
+                #444 75%, 
+                transparent 75%, 
+                transparent
+            );
+            background-size: 40px 40px;
+            animation: loading 1.2s linear infinite;
+        }
+        .lazy.loaded {
+            height: auto;
+            background: none;
+            animation: none;
+        }
+        @keyframes loading {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 40px; }
+        }
+        button { 
+            position: absolute; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            background: rgba(255,255,255,0.3); 
+            border: none; 
+            padding: 12px; 
+            cursor: pointer; 
+            font-size: 18px; 
+            z-index: 10; 
+            border-radius: 50%;
+            color: #fff;
+        }
+        .prev { left: 10px; }
+        .next { right: 10px; }
+        @media (max-width: 768px) {
+            button { padding: 8px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="slider">
+        <div class="slider-inner">
+            <div class="slider-item"><img data-src="https://img.meituan.net/portalweb/45f75bff229967bbed1b97a254d389948817063.jpg" alt="图片1" class="lazy"></div>
+            <div class="slider-item"><img data-src="https://img.meituan.net/portalweb/72a05ec03100d613e2c3cc5d239cec806324711.jpg" alt="图片2" class="lazy"></div>
+            <div class="slider-item"><img data-src="https://img.meituan.net/portalweb/72a05ec03100d613e2c3cc5d239cec806324711.jpg" alt="图片3" class="lazy"></div>
+            <div class="slider-item"><img data-src="https://img.meituan.net/portalweb/d2882db925bbd1378ffcf4fa2a7ba5c28937114.jpg" alt="图片4" class="lazy"></div>
+            <div class="slider-item"><img data-src="https://img.meituan.net/portalweb/0c2cc3ec674eba316f2ead42060e93607239199.jpg" alt="图片5" class="lazy"></div>
+            <div class="slider-item"><img data-src="https://img.meituan.net/portalweb/0c2cc3ec674eba316f2ead42060e93607239199.jpg" alt="图片6" class="lazy"></div>
+            <div class="slider-item"><img data-src="https://img.meituan.net/portalweb/c0315ab33f3e5b1c23039dd13df1f92b7452184.jpg" alt="图片7" class="lazy"></div>
+            <div class="slider-item"><img data-src="https://img.meituan.net/portalweb/c0315ab33f3e5b1c23039dd13df1f92b7452184.jpg" alt="图片8" class="lazy"></div>
+            <div class="slider-item"><img data-src="https://img.meituan.net/portalweb/317df684bd40f8bbaba662edf972cc249563586.jpg" alt="图片9" class="lazy"></div>
+            <div class="slider-item"><img data-src="https://img.meituan.net/portalweb/7b35c6394780013f627c9c4b57d56e511050185.jpg" alt="图片10" class="lazy"></div>
+            <div class="slider-item"><img data-src="https://img.meituan.net/portalweb/faa7360513b35c77a6db55805d119d57884017.jpg" alt="图片11" class="lazy"></div>
+            <div class="slider-item"><img data-src="https://img.meituan.net/portalweb/a078e2f043943b1329d677a314a169732056764.jpg" alt="图片12" class="lazy"></div>
+        </div>
+        <button class="prev" onclick="move(-1)">←</button>
+        <button class="next" onclick="move(1)">→</button>
+    </div>
+
+    <script>
+        // 懒加载逻辑
+        document.addEventListener("DOMContentLoaded", function() {
+            const lazyImages = document.querySelectorAll(".lazy");
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.src;
+                        img.onload = () => {
+                            img.classList.add("loaded");
+                        };
+                        observer.unobserve(img);
+                    }
+                });
+            });
+            lazyImages.forEach(img => imageObserver.observe(img));
+        });
+
+        // 轮播逻辑
+        let index = 0;
+        function move(step) {
+            const inner = document.querySelector('.slider-inner');
+            const items = inner.querySelectorAll('.slider-item');
+            index = (index + step + items.length) % items.length;
+            inner.style.transform = `translateX(-${index * 100}%)`;
+        }
+    </script>
+</body>
+</html>
